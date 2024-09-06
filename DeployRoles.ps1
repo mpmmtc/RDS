@@ -21,15 +21,31 @@ function Check-ServerRole {
 function Collect-ServerInfo {
     Clear-Host
     
+    $dom = read-host "Enter the domain FQDN (e.g.Contoso.com)"
+
     # Ask for Broker Server name
-    $brokerServer = Read-Host "Enter the Broker Server name (e.g. RDCB.Contoso.com)"
+    $brokerServerx = Read-Host "Enter the Broker Server name (e.g. RDCB.$dom)"
+
+    if($brokerServerx -notcontains "*.*"){
+        $brokerServer = '{0}.{1}' -f $brokerServerx,$dom
+    }else{
+        $brokerServer = $brokerServerx
+    }
+
+    
 
     # Ask if the Broker Server is also the Web Access Server
     $isWebAccessServer = Read-Host "Is the Broker Server also the Web Access Server? (y/n)"
     if ($isWebAccessServer -eq 'y') {
         $webAccessServer = $brokerServer
     } else {
-        $webAccessServer = Read-Host "Enter the Web Access Server name (e.g. RDWA.Contoso.com)"
+        $webAccessServerx = Read-Host "Enter the Web Access Server name (e.g. RDWA.Contoso.com)"
+        if($webAccessServerx -notcontains "*.*"){
+        $webAccessServer = '{0}.{1}' -f $webAccessServerx,$dom
+    }else{
+        $webAccessServer = $webAccessServerx
+    }
+        
     }
 
     # Ask for Session Host base name
@@ -44,7 +60,7 @@ function Collect-ServerInfo {
     # Loop to create session host names with two-digit formatting for numbers < 10
     for ($i = 1; $i -le $sessionHostCount; $i++) {
         $sessionNumber = "{0:D2}" -f $i  # Format number with two digits
-        $sessionHosts += "$sessionHostBaseName$sessionNumber.Contoso.com"
+        $sessionHosts += "$sessionHostBaseName$sessionNumber.$dom"
     }
 
     # Output the server names
